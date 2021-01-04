@@ -21,7 +21,7 @@ pygame.display.set_caption('Ricci flow')
 scale = 32
 
 base_curve_delta = 32
-dens = 4
+dens = 2
 curve_delta = base_curve_delta
 
 run = True
@@ -100,14 +100,19 @@ def compute_curvature(curve):
 
 def reduce_curve(curve):
     global curve_delta
+    global scale
     i = 0
-    while i < curve.shape[0]:
-        x = curve[(i - 1)%curve.shape[0]]
-        y = curve[i]
-        z = curve[(i + 1)%curve.shape[0]]
-        if abs(x - y) < curve_delta/scale and abs(y - z) < curve_delta/scale:
-            curve = curve[curve != y]
-        i += 1
+    deleted = True
+    while deleted:
+        deleted = False
+        while i < curve.shape[0]:
+            x = curve[(i - 1)%curve.shape[0]]
+            y = curve[i]
+            z = curve[(i + 1)%curve.shape[0]]
+            if abs(x - y) < curve_delta/scale and abs(y - z) < curve_delta/scale:
+                curve = curve[curve != y]
+                deleted = True
+            i += 1
     return curve
 
 def smoothen(curve, d):
@@ -261,8 +266,8 @@ while True:
                 pygame.draw.line(window, (0, int(255*(1 - clamp(cd, 0, 1))), int(255*clamp(cd, 0, 1))),
                                  ctop(curve_[i]), ctop(curve_[(i+1)%curve_.shape[0]]), 4)
 
-    draw_text(f'{1/delta_time:10.0f}', 24, (0,)*3, window, (0, 0), anchor='topleft')
-    draw_text(f'{compute_steps_per_sec:10.0f}', 24, (0,)*3, window, (0, 24), anchor='topleft')
+    #draw_text(f'{1/delta_time:10.0f}', 24, (0,)*3, window, (0, 0), anchor='topleft')
+    #draw_text(f'{compute_steps_per_sec:10.0f}', 24, (0,)*3, window, (0, 24), anchor='topleft')
 
     pygame.display.update()
     clock.tick(60)
